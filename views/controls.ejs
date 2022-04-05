@@ -1,0 +1,176 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Jule's Stuff</title>
+  </head>
+  <body>
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+
+
+<div id="counterDiv">
+<form id="count">
+  <label id="setCounter">
+    Setup Counter
+  </label>
+</br>
+    <label for="setCounterText">Title:</label>
+    <input id="setCounterText" type="text" name="text">
+  </br>
+    <label for="setCurrentAmount">Current:</label>
+  <input id="setCurrentAmount" type="number" name="currentAmount">
+</br>
+  <label for="setGoalAmount">Goal:</label>
+<input id="setGoalAmount" type="number" name="goalAmount">
+
+</br>
+<input id="submitCounter" type="submit" value="Submit Settings">
+</form>
+<form id="colors">
+
+  <label id="setColors">
+    Setup Colors
+  </label>
+</br>
+    <label for="setTextColor">Text:</label>
+    <input id="setTextColor" type="color" name="tColor" value="#ffffff">
+  </br>
+    <label for="setProgressColor">Progress Color:</label>
+  <input id="setProgressColor" type="color" name="pColor" value="#ffffff">
+</br>
+  <label for="setBackgroundColor">Background Color:</label>
+<input id="setBackgroundColor" type="color" name="bgColor" value="#ffffff">
+</br>
+<input id="submitColor" type="submit" value="Submit Colors">
+</form>
+
+<div id="changeNumber">
+  <input id="changeValue" type="number"></input>
+  <button onclick="increaseCounter()">Increase Amount</button>
+  <button onclick="decreaseCounter()">Decrease Amount</button>
+</div>
+<!--
+<h3>Current Stats</h3>
+<p id="title"></p>
+<p id="currentAmount"></p>
+<p id="currentCounter"></p>
+<p id="currentBGColor"></p>
+<p id="currentPColor"></p>
+<p id="currentTColor"></p> -->
+</div>
+
+   <script>
+    $('#count').submit(function(){
+      submitCount();
+      return false;
+    });
+
+    function submitCount(){
+      var text = document.getElementById("setCounterText").value;
+      var currAmt = document.getElementById("setCurrentAmount").value;
+      var goalAmt = document.getElementById("setGoalAmount").value;
+
+      var countOut = {type: "setCount", text: text, currAmt: currAmt, goalAmt: goalAmt};
+      //submit to server
+      $.ajax({
+        url: '/',
+        type: 'post',
+        data: countOut,
+        success:function(data){
+          getCounter();
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert("Error occurred in request");
+          }
+      });
+    }
+
+    $('#colors').submit(function(){
+      submitColor();
+      return false;
+    });
+
+    function submitColor(){
+      var text = document.getElementById("setTextColor").value;
+      var progress = document.getElementById("setProgressColor").value;
+      var background = document.getElementById("setBackgroundColor").value;
+
+      var countOut = {type: "setColor", tColor: text, pColor: progress, bgColor: background};
+      //submit to server
+      $.ajax({
+        url: '/',
+        type: 'post',
+        data: countOut,
+        success:function(data){
+          getCounter();
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert("Error occurred in request");
+          }
+      });
+    }
+
+
+
+    function increaseCounter(){
+      var value = document.getElementById("changeValue").value;
+      var dOut = {type: 'add', amt: value};
+      $.ajax({
+        url: '/',
+        type: 'post',
+        data: dOut,
+        success:function(data){
+          getCounter();
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert("Error occurred in request");
+          }
+      });
+    }
+
+    function decreaseCounter() {
+      var value = document.getElementById("changeValue").value;
+      var dOut = {type: 'remove', amt: value};
+      //submit to server
+      $.ajax({
+        url: '/',
+        type: 'post',
+        data: dOut,
+        success:function(data){
+          getCounter();
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert("Error occurred in request");
+          }
+      });
+    }
+
+    function getCounter(){
+      $.ajax({
+        url: '/getData',
+        type: 'get',
+        success:function(data){
+
+          //fill inputs
+          
+          document.getElementById("setBackgroundColor").value = data.bgColor;
+          document.getElementById("setProgressColor").value = data.pColor;
+          document.getElementById("setTextColor").value = data.tColor;
+
+          document.getElementById("setCounterText").setAttribute('value', data.text);
+          document.getElementById("setCurrentAmount").setAttribute('value', data.currAmt);
+          document.getElementById("setGoalAmount").setAttribute('value', data.goalAmt);
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+            alert("Error occurred in get request");
+          }
+      });
+    }
+
+
+$(document).ready(function(){
+  getCounter();
+});
+   </script>
+  </body>
+</html>
